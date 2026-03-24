@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Heb ik recht op een vast contract?</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#26215C;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem;transition:background 0.6s ease}
+body.app-active{background:#f3f2ff}
+
+#intro{position:fixed;inset:0;background:#26215C;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;z-index:100;transition:opacity 0.6s ease}
+#intro.fade-out{opacity:0;pointer-events:none}
+
+.intro-logo{opacity:0;transform:scale(0.5);transition:opacity 0.8s ease,transform 0.8s cubic-bezier(0.34,1.56,0.64,1)}
+.intro-logo.show{opacity:1;transform:scale(1)}
+
+.intro-title{opacity:0;transform:translateY(18px);transition:opacity 0.6s ease,transform 0.6s ease;text-align:center}
+.intro-title.show{opacity:1;transform:translateY(0)}
+.intro-title h1{color:#EEEDFE;font-size:22px;font-weight:500;margin-bottom:6px;line-height:1.3}
+.intro-title p{color:#7F77DD;font-size:14px}
+
+.intro-btn{opacity:0;transform:translateY(10px);transition:opacity 0.5s ease,transform 0.5s ease,background 0.15s;padding:13px 40px;background:#534AB7;color:#EEEDFE;border:none;border-radius:10px;font-size:15px;font-weight:500;font-family:inherit;cursor:pointer}
+.intro-btn.show{opacity:1;transform:translateY(0)}
+.intro-btn:hover{background:#3C3489}
+.intro-btn:active{transform:scale(0.97)}
+
+#main{opacity:0;transition:opacity 0.6s ease;width:100%;max-width:700px}
+#main.show{opacity:1}
+
+.app{background:#EEEDFE;border-radius:16px;overflow:hidden;width:100%;box-shadow:0 4px 24px rgba(83,74,183,0.12)}
+.header{background:#534AB7;padding:1.25rem 1.5rem;display:flex;align-items:center;gap:12px}
+.logo-wrap{width:38px;height:38px;background:#3C3489;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-wrap svg{width:38px;height:38px}
+.header-text h2{color:#EEEDFE;font-size:16px;font-weight:500;line-height:1.2}
+.header-text p{color:#AFA9EC;font-size:12px;margin-top:2px}
+.body{padding:1.5rem}
+.prog-row{display:flex;align-items:center;gap:6px;margin-bottom:1.5rem}
+.prog-dot{width:8px;height:8px;border-radius:50%;background:#AFA9EC;transition:all 0.2s}
+.prog-dot.done{background:#1D9E75}
+.prog-dot.cur{background:#534AB7;width:10px;height:10px}
+.prog-lbl{font-size:12px;color:#534AB7;font-weight:500;margin-left:4px}
+.card{background:#fff;border-radius:14px;padding:1.5rem;border:0.5px solid #CECBF6;display:none}
+.card.on{display:block}
+.step-pill{display:inline-flex;align-items:center;gap:6px;background:#EEEDFE;border:0.5px solid #CECBF6;border-radius:99px;padding:4px 12px;margin-bottom:1rem}
+.step-num{width:18px;height:18px;background:#534AB7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#fff}
+.step-lbl{font-size:12px;color:#534AB7;font-weight:500}
+.vraag{font-size:18px;font-weight:500;color:#26215C;line-height:1.5;margin-bottom:0.6rem}
+.hint{font-size:13px;color:#5F5E5A;line-height:1.65;margin-bottom:1.5rem;background:#F1EFE8;border-radius:8px;padding:0.75rem 1rem}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn{padding:12px 28px;border-radius:10px;font-size:15px;font-family:inherit;cursor:pointer;font-weight:500;border:none;transition:transform 0.1s,background 0.15s}
+.btn:active{transform:scale(0.97)}
+.btn-ja{background:#534AB7;color:#fff}
+.btn-ja:hover{background:#3C3489}
+.btn-nee{background:#EEEDFE;color:#3C3489;border:0.5px solid #AFA9EC}
+.btn-nee:hover{background:#CECBF6}
+.back-btn{background:none;border:none;font-size:13px;color:#7F77DD;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:4px;margin-bottom:1.25rem;padding:0}
+.back-btn:hover{color:#26215C}
+.uitkomst{border-radius:14px;padding:2rem;display:none;text-align:center}
+.uitkomst.on{display:block}
+.u-vast{background:#085041}
+.u-niet{background:#712B13}
+.u-icoon{width:64px;height:64px;border-radius:50%;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center}
+.u-vast .u-icoon{background:#1D9E75}
+.u-niet .u-icoon{background:#993C1D}
+.u-icoon svg{width:32px;height:32px}
+.u-kop{font-size:22px;font-weight:500;margin-bottom:0.75rem;line-height:1.3}
+.u-vast .u-kop{color:#9FE1CB}
+.u-niet .u-kop{color:#F5C4B3}
+.u-tekst{font-size:14px;line-height:1.75;max-width:480px;margin:0 auto 1rem}
+.u-vast .u-tekst{color:#5DCAA5}
+.u-niet .u-tekst{color:#F0997B}
+.u-disc{font-size:12px;max-width:420px;margin:0 auto 1.5rem;line-height:1.6}
+.u-vast .u-disc{color:#1D9E75}
+.u-niet .u-disc{color:#D85A30}
+.opnieuw{padding:10px 24px;border-radius:8px;font-size:14px;cursor:pointer;font-family:inherit;font-weight:500;border:none;background:#fff;color:#26215C}
+.opnieuw:hover{background:#EEEDFE}
+</style>
+</head>
+<body>
+
+<div id="intro">
+  <div class="intro-logo" id="ilogo">
+    <svg width="100" height="100" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="80" height="80" rx="18" fill="#3C3489"/>
+      <line x1="40" y1="12" x2="40" y2="65" stroke="#EEEDFE" stroke-width="2" stroke-linecap="round"/>
+      <line x1="20" y1="65" x2="60" y2="65" stroke="#EEEDFE" stroke-width="2" stroke-linecap="round"/>
+      <line x1="30" y1="12" x2="50" y2="12" stroke="#EEEDFE" stroke-width="2" stroke-linecap="round"/>
+      <line x1="40" y1="12" x2="18" y2="22" stroke="#7F77DD" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="40" y1="12" x2="62" y2="22" stroke="#7F77DD" stroke-width="1.8" stroke-linecap="round"/>
+      <rect x="10" y="22" width="16" height="16" rx="4" fill="#534AB7"/>
+      <rect x="54" y="22" width="16" height="16" rx="4" fill="#534AB7"/>
+      <line x1="18" y1="22" x2="18" y2="38" stroke="#AFA9EC" stroke-width="1" stroke-linecap="round"/>
+      <line x1="62" y1="22" x2="62" y2="38" stroke="#AFA9EC" stroke-width="1" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="intro-title" id="ititle">
+    <h1>Heb ik recht op een vast contract?</h1>
+    <p>Ontdek in een paar stappen wat jouw rechten zijn</p>
+  </div>
+  <button class="intro-btn" id="ibtn" onclick="startApp()">Start de check</button>
+</div>
+
+<div id="main">
+  <div class="app">
+    <div class="header">
+      <div class="logo-wrap">
+        <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="80" height="80" rx="18" fill="#3C3489"/>
+          <line x1="40" y1="12" x2="40" y2="65" stroke="#EEEDFE" stroke-width="2" stroke-linecap="round"/>
+          <line x1="20" y1="65" x2="60" y2="65" stroke="#EEEDFE" stroke-width="2" stroke-linecap="round"/>
+          <line x1="30" y1="12" x2="50" y2="12" stroke="#EEEDFE" stroke-width="2" stroke-linecap="round"/>
+          <line x1="40" y1="12" x2="18" y2="22" stroke="#7F77DD" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="40" y1="12" x2="62" y2="22" stroke="#7F77DD" stroke-width="1.8" stroke-linecap="round"/>
+          <rect x="10" y="22" width="16" height="16" rx="4" fill="#534AB7"/>
+          <rect x="54" y="22" width="16" height="16" rx="4" fill="#534AB7"/>
+          <line x1="18" y1="22" x2="18" y2="38" stroke="#AFA9EC" stroke-width="1" stroke-linecap="round"/>
+          <line x1="62" y1="22" x2="62" y2="38" stroke="#AFA9EC" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h2>Heb ik recht op een vast contract?</h2>
+        <p>Beantwoord de vragen en ontdek je rechten</p>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="prog-row" id="prog"></div>
+
+      <div class="card on" id="s1">
+        <div class="step-pill"><div class="step-num">1</div><span class="step-lbl">Vraag 1 van maximaal 6</span></div>
+        <p class="vraag">Heb je een tijdelijk contract bij je huidige werkgever?</p>
+        <p class="hint">Een tijdelijk contract heeft een einddatum — zoals "voor 6 maanden" of "tot 31 december". Een vast contract heeft geen einddatum.</p>
+        <div class="btns">
+          <button class="btn btn-ja" onclick="ga('s2')">Ja</button>
+          <button class="btn btn-nee" onclick="toon('geen-tijdelijk')">Nee</button>
+        </div>
+      </div>
+
+      <div class="card" id="s2">
+        <button class="back-btn" onclick="terug('s1')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 12L6 8l4-4"/></svg> Terug</button>
+        <div class="step-pill"><div class="step-num">2</div><span class="step-lbl">Vraag 2</span></div>
+        <p class="vraag">Heb je eerder ook tijdelijke contracten gehad bij dezelfde werkgever?</p>
+        <p class="hint">Het maakt niet uit of je functie iets anders heette. Het gaat erom dat het dezelfde werkgever is.</p>
+        <div class="btns">
+          <button class="btn btn-ja" onclick="ga('s3')">Ja, meerdere contracten</button>
+          <button class="btn btn-nee" onclick="toon('nog-niet-1')">Nee, dit is mijn eerste</button>
+        </div>
+      </div>
+
+      <div class="card" id="s3">
+        <button class="back-btn" onclick="terug('s2')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 12L6 8l4-4"/></svg> Terug</button>
+        <div class="step-pill"><div class="step-num">3</div><span class="step-lbl">Vraag 3</span></div>
+        <p class="vraag">Hoeveel tijdelijke contracten heb je in totaal gehad bij deze werkgever?</p>
+        <p class="hint">Tel je huidige contract ook mee. Elk los contract telt apart, ook als er een kleine pauze tussenin zat.</p>
+        <div class="btns">
+          <button class="btn btn-ja" onclick="ga('s4a')">Meer dan 3 contracten</button>
+          <button class="btn btn-nee" onclick="ga('s4b')">3 of minder contracten</button>
+        </div>
+      </div>
+
+      <div class="card" id="s4a">
+        <button class="back-btn" onclick="terug('s3')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 12L6 8l4-4"/></svg> Terug</button>
+        <div class="step-pill"><div class="step-num">4</div><span class="step-lbl">Vraag 4</span></div>
+        <p class="vraag">Was er ooit een pauze van meer dan 6 maanden tussen twee contracten?</p>
+        <p class="hint">Een pauze is een periode zonder contract bij deze werkgever. Was er meer dan één pauze? Controleer of een van die pauzes langer dan 6 maanden duurde.</p>
+        <div class="btns">
+          <button class="btn btn-nee" onclick="toon('vast')">Nee, altijd korter dan 6 maanden</button>
+          <button class="btn btn-ja" onclick="ga('s5a')">Ja, er was een pauze van meer dan 6 maanden</button>
+        </div>
+      </div>
+
+      <div class="card" id="s4b">
+        <button class="back-btn" onclick="terug('s3')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 12L6 8l4-4"/></svg> Terug</button>
+        <div class="step-pill"><div class="step-num">4</div><span class="step-lbl">Vraag 4</span></div>
+        <p class="vraag">Hoeveel maanden werk je in totaal al bij deze werkgever?</p>
+        <p class="hint">Tel de looptijd van alle contracten bij elkaar op. Pauzes daartussen tel je niet mee. Voorbeeld: 12 + 12 + 6 = 30 maanden.</p>
+        <div class="btns">
+          <button class="btn btn-ja" onclick="ga('s5b')">Meer dan 36 maanden (3 jaar)</button>
+          <button class="btn btn-nee" onclick="toon('nog-niet-2')">36 maanden of minder</button>
+        </div>
+      </div>
+
+      <div class="card" id="s5a">
+        <button class="back-btn" onclick="terug('s4a')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 12L6 8l4-4"/></svg> Terug</button>
+        <div class="step-pill"><div class="step-num">5</div><span class="step-lbl">Vraag 5</span></div>
+        <p class="vraag">Kijk alleen naar de contracten ná die lange pauze. Zijn dat er meer dan 3?</p>
+        <p class="hint">Na een pauze van meer dan 6 maanden begint de teller opnieuw. Contracten van vóór de pauze tellen dan niet meer mee.</p>
+        <div class="btns">
+          <button class="btn btn-ja" onclick="ga('s6a')">Ja, meer dan 3 contracten ná de pauze</button>
+          <button class="btn btn-nee" onclick="ga('s6b')">Nee, 3 of minder ná de pauze</button>
+        </div>
+      </div>
+
+      <div class="card" id="s5b">
+        <button class="back-btn" onclick="terug('s4b')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 12L6 8l4-4"/></svg> Terug</button>
+        <div class="step-pill"><div class="step-num">5</div><span class="step-lbl">Vraag 5</span></div>
+        <p class="vraag">Was er een pauze van meer dan 6 maanden tussen twee contracten?</p>
+        <p class="hint">Na zo'n lange pauze tellen de contracten van daarvóór niet meer mee. We kijken dan alleen naar wat erna is gekomen.</p>
+        <div class="btns">
+          <button class="btn btn-nee" onclick="toon('vast')">Nee, alle pauzes waren korter</button>
+          <button class="btn btn-ja" onclick="ga('s6c')">Ja, er was een pauze van meer dan 6 maanden</button>
+        </div>
+      </div>
+
+      <div class="card" id="s6a">
+        <button class="back-btn" onclick="terug('s5a')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 12L6 8l4-4"/></svg> Terug</button>
+        <div class="step-pill"><div class="step-num">6</div><span class="step-lbl">Vraag 6</span></div>
+        <p class="vraag">Was er ná die lange pauze opnieuw een pauze van meer dan 6 maanden?</p>
+        <p class="hint">Elke pauze van meer dan 6 maanden doorbreekt de keten opnieuw.</p>
+        <div class="btns">
+          <button class="btn btn-nee" onclick="toon('vast')">Nee, daarna altijd korter dan 6 maanden</button>
+          <button class="btn btn-ja" onclick="toon('nog-niet-3')">Ja, er was nog een lange pauze</button>
+        </div>
+      </div>
+
+      <div class="card" id="s6b">
+        <button class="back-btn" onclick="terug('s5a')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 12L6 8l4-4"/></svg> Terug</button>
+        <div class="step-pill"><div class="step-num">6</div><span class="step-lbl">Vraag 6</span></div>
+        <p class="vraag">Duren de contracten ná de lange pauze samen meer dan 36 maanden?</p>
+        <p class="hint">Tel alleen de contracten ná de pauze bij elkaar op.</p>
+        <div class="btns">
+          <button class="btn btn-ja" onclick="toon('vast')">Ja, meer dan 36 maanden</button>
+          <button class="btn btn-nee" onclick="toon('nog-niet-3')">Nee, korter</button>
+        </div>
+      </div>
+
+      <div class="card" id="s6c">
+        <button class="back-btn" onclick="terug('s5b')"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 12L6 8l4-4"/></svg> Terug</button>
+        <div class="step-pill"><div class="step-num">6</div><span class="step-lbl">Vraag 6</span></div>
+        <p class="vraag">Tellen alleen de contracten ná de lange pauze: duren die samen meer dan 36 maanden, of zijn het er meer dan 3?</p>
+        <p class="hint">Na de pauze begint alles opnieuw. Kijk dus alleen naar de situatie ná de pauze.</p>
+        <div class="btns">
+          <button class="btn btn-ja" onclick="toon('vast')">Ja</button>
+          <button class="btn btn-nee" onclick="toon('nog-niet-3')">Nee</button>
+        </div>
+      </div>
+
+      <div class="uitkomst u-vast" id="uitkomst-vast">
+        <div class="u-icoon"><svg viewBox="0 0 32 32" fill="none"><polyline points="6,16 13,23 26,9" stroke="#E1F5EE" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <p class="u-kop">Ja! Je hebt recht op een vast contract</p>
+        <p class="u-tekst">Op basis van jouw antwoorden is jouw tijdelijke contract automatisch omgezet in een vast contract. Dit staat in de wet (art. 7:668a BW). Je werkgever was verplicht je een vast contract te geven — ook als dat nooit is besproken. Een andere functietitel of een korte onderbreking maakt dit in de meeste gevallen niet ongedaan.</p>
+        <p class="u-disc">Dit is een eerste oriëntatie, geen juridisch advies. Twijfel je? Neem contact op met een jurist, je vakbond of het Juridisch Loket (0900-8020).</p>
+        <button class="opnieuw" onclick="reset()">Opnieuw beginnen</button>
+      </div>
+
+      <div class="uitkomst u-niet" id="uitkomst-geen-tijdelijk">
+        <div class="u-icoon"><svg viewBox="0 0 32 32" fill="none"><line x1="10" y1="10" x2="22" y2="22" stroke="#FAECE7" stroke-width="2.5" stroke-linecap="round"/><line x1="22" y1="10" x2="10" y2="22" stroke="#FAECE7" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+        <p class="u-kop">Nog geen recht via deze regeling</p>
+        <p class="u-tekst">Je hebt aangegeven dat je geen tijdelijk contract hebt. De regels over automatisch vastword-contracten gelden alleen bij tijdelijke contracten. Heb je toch een tijdelijk contract? Begin opnieuw en beantwoord de eerste vraag met "Ja".</p>
+        <p class="u-disc">Twijfel je? Neem contact op met een jurist, je vakbond of het Juridisch Loket (0900-8020).</p>
+        <button class="opnieuw" onclick="reset()">Opnieuw beginnen</button>
+      </div>
+
+      <div class="uitkomst u-niet" id="uitkomst-nog-niet-1">
+        <div class="u-icoon"><svg viewBox="0 0 32 32" fill="none"><line x1="10" y1="10" x2="22" y2="22" stroke="#FAECE7" stroke-width="2.5" stroke-linecap="round"/><line x1="22" y1="10" x2="10" y2="22" stroke="#FAECE7" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+        <p class="u-kop">Nog geen recht op een vast contract</p>
+        <p class="u-tekst">Dit is je eerste tijdelijke contract bij deze werkgever. Je hebt pas recht op een automatisch vast contract als je meer dan 3 tijdelijke contracten hebt gehad, of als je in totaal langer dan 3 jaar aaneengesloten tijdelijk hebt gewerkt bij dezelfde werkgever.</p>
+        <p class="u-disc">Twijfel je? Neem contact op met een jurist, je vakbond of het Juridisch Loket (0900-8020).</p>
+        <button class="opnieuw" onclick="reset()">Opnieuw beginnen</button>
+      </div>
+
+      <div class="uitkomst u-niet" id="uitkomst-nog-niet-2">
+        <div class="u-icoon"><svg viewBox="0 0 32 32" fill="none"><line x1="10" y1="10" x2="22" y2="22" stroke="#FAECE7" stroke-width="2.5" stroke-linecap="round"/><line x1="22" y1="10" x2="10" y2="22" stroke="#FAECE7" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+        <p class="u-kop">Nog geen recht op een vast contract</p>
+        <p class="u-tekst">Je contracten duren samen nog geen 3 jaar en je hebt niet meer dan 3 contracten. Je werkgever mag je nog tijdelijk in dienst houden. Zodra je meer dan 3 contracten hebt, of ze duren samen meer dan 3 jaar zonder lange pauze, ontstaat automatisch een vast contract.</p>
+        <p class="u-disc">Twijfel je? Neem contact op met een jurist, je vakbond of het Juridisch Loket (0900-8020).</p>
+        <button class="opnieuw" onclick="reset()">Opnieuw beginnen</button>
+      </div>
+
+      <div class="uitkomst u-niet" id="uitkomst-nog-niet-3">
+        <div class="u-icoon"><svg viewBox="0 0 32 32" fill="none"><line x1="10" y1="10" x2="22" y2="22" stroke="#FAECE7" stroke-width="2.5" stroke-linecap="round"/><line x1="22" y1="10" x2="10" y2="22" stroke="#FAECE7" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+        <p class="u-kop">Nog geen recht op een vast contract</p>
+        <p class="u-tekst">Door de lange pauze van meer dan 6 maanden is de "keten" van contracten doorbroken. De contracten van daarvóór tellen niet meer mee. Na de pauze zijn er ook nog niet genoeg contracten of jaren geweest om automatisch recht op een vast contract te krijgen.</p>
+        <p class="u-disc">Twijfel je? Neem contact op met een jurist, je vakbond of het Juridisch Loket (0900-8020).</p>
+        <button class="opnieuw" onclick="reset()">Opnieuw beginnen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var huidig='s1';
+var gesch=[];
+var stappen=['s1','s2','s3','s4a','s4b','s5a','s5b','s6a','s6b','s6c'];
+
+function updateProg(){
+  var idx=stappen.indexOf(huidig);
+  var pb=document.getElementById('prog');
+  if(idx<0){pb.innerHTML='';return;}
+  var h='';
+  for(var i=0;i<stappen.length;i++){
+    var c=i<idx?'prog-dot done':(i===idx?'prog-dot cur':'prog-dot');
+    h+='<div class="'+c+'"></div>';
+  }
+  h+='<span class="prog-lbl">Vraag '+(idx+1)+'</span>';
+  pb.innerHTML=h;
+}
+
+function toonEnkel(id){
+  document.querySelectorAll('.card,.uitkomst').forEach(function(e){e.classList.remove('on');});
+  document.getElementById(id).classList.add('on');
+}
+
+function ga(id){gesch.push(huidig);huidig=id;toonEnkel(id);updateProg();}
+function toon(uid){gesch.push(huidig);huidig=null;toonEnkel('uitkomst-'+uid);document.getElementById('prog').innerHTML='';}
+function terug(id){if(gesch.length>0)gesch.pop();huidig=id;toonEnkel(id);updateProg();}
+
+function reset(){
+  gesch=[];huidig='s1';toonEnkel('s1');updateProg();
+}
+
+function startApp(){
+  document.getElementById('intro').classList.add('fade-out');
+  setTimeout(function(){
+    document.getElementById('intro').style.display='none';
+    document.body.classList.add('app-active');
+    document.getElementById('main').classList.add('show');
+  },650);
+}
+
+window.addEventListener('load',function(){
+  setTimeout(function(){document.getElementById('ilogo').classList.add('show');},300);
+  setTimeout(function(){document.getElementById('ititle').classList.add('show');},750);
+  setTimeout(function(){document.getElementById('ibtn').classList.add('show');},1100);
+});
+
+updateProg();
+</script>
+</body>
+</html>
